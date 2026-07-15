@@ -1,5 +1,10 @@
 # Token for AI — Universal Token Optimization Engine & Context Layer
 
+<p align="center">
+  <img src="assets/dashboard_mockup.png" width="49%" alt="Token for AI Dashboard Mockup" />
+  <img src="assets/context_compression.png" width="49%" alt="Context Compression Concept" />
+</p>
+
 **Token for AI** is a state-of-the-art Single Page Application (SPA) designed to serve as a local token optimization engine and context management layer for LLM (Large Language Model) interactions. It provides a real-time playground for compressing prompt content, running multi-agent workflows, managing long-term memory retrieval, and generating session snapshots to recover from context window limitations.
 
 ---
