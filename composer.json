@@ -1,0 +1,11 @@
+{
+    "name": "vijaymahes9080/token-optimization",
+    "description": "Universal Token Optimization Engine & Context Layer for LLM Interactions",
+    "authors": [
+        {
+            "name": "Vijay Mahes",
+            "email": "Vijaypradhap2004@gmail.com"
+        }
+    ],
+    "require": {}
+}

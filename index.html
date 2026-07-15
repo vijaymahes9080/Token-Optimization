@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token for AI — Universal Token Optimization Engine & Context Layer</title>
+  <meta name="description" content="State-of-the-art context compression, memory retrieval, context switching, and session recovery dashboard for long-context LLM orchestration.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Background Decorative Glowing Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <header class="app-header">
+    <div class="header-logo">
+      <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>Token for AI</h1>
+      <span class="badge-glow">OPTIMIZATION ENGINE v1.2</span>
+    </div>
+    
+    <div class="header-status">
+      <span class="status-indicator online"></span>
+      <span id="active-mode-display">Mode: Architect (Orchestration)</span>
+      <span class="divider">|</span>
+      <span id="global-tokens-saved">Total Saved: 0%</span>
+    </div>
+  </header>
+
+  <main class="dashboard-grid">
+    
+    <!-- SECTION 1: PROMPT INPUT & CONTROL PANEL -->
+    <section class="card control-card" aria-labelledby="input-heading">
+      <div class="card-header">
+        <h2 id="input-heading">Context Workshop</h2>
+        <span class="card-subtitle">Input your raw context or instructions</span>
+      </div>
+      <div class="card-body">
+        <div class="input-container">
+          <textarea id="raw-prompt-input" placeholder="Paste your raw context, long prompt, or conversation history here..." aria-label="Raw prompt context"></textarea>
+          <button id="clear-input-btn" class="icon-btn" title="Clear input" aria-label="Clear input">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+
+        <div class="control-group">
+          <label for="compression-level-slider" class="control-label">
+            <span>Compression Level</span>
+            <span id="compression-level-badge" class="level-badge badge-0">Level 0: Full Context</span>
+          </label>
+          <input type="range" id="compression-level-slider" min="0" max="4" value="0" class="custom-slider" step="1">
+          <div class="slider-labels">
+            <span>Raw</span>
+            <span>Summary</span>
+            <span>Compact</span>
+            <span>Essential</span>
+            <span>Recovery</span>
+          </div>
+        </div>
+
+        <div class="token-limit-selector">
+          <label for="token-limit-select" class="control-label">Target Model Limit</label>
+          <select id="token-limit-select">
+            <option value="8192">8K (GPT-4 / Claude Instant)</option>
+            <option value="32768" selected>32K (Standard Models / Claude 3 Sonnet)</option>
+            <option value="131072">128K (GPT-4o / Claude 3.5 Sonnet)</option>
+            <option value="1048576">1M+ (Gemini Pro)</option>
+          </select>
+        </div>
+
+        <div class="action-buttons-group">
+          <button id="optimize-prompt-btn" class="primary-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            Compress Prompt
+          </button>
+          <button id="run-pipeline-btn" class="secondary-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 3l14 9-14 9V3z"/></svg>
+            Run Agent Pipeline
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: METRICS & OPTIMIZED OUTPUT -->
+    <section class="card output-card" aria-labelledby="output-heading">
+      <div class="card-header">
+        <h2 id="output-heading">Optimized Context</h2>
+        <span class="card-subtitle">Output ready for direct model input</span>
+      </div>
+      <div class="card-body">
+        
+        <!-- Metrics Row -->
+        <div class="metrics-grid">
+          <div class="metric-block">
+            <div class="metric-label">Reduction</div>
+            <div class="metric-value" id="metrics-reduction">0%</div>
+            <div class="metric-progress-wrapper">
+              <div class="metric-progress-bar" id="metrics-reduction-bar" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="metric-block">
+            <div class="metric-label">Token Estimate</div>
+            <div class="metric-value-row">
+              <span class="metric-val-main" id="metrics-opt-tokens">0</span>
+              <span class="metric-val-sub">/ <span id="metrics-raw-tokens">0</span> original</span>
+            </div>
+            <div class="metric-status-text" id="metrics-limit-warning">Within normal limits</div>
+          </div>
+        </div>
+
+        <div class="output-container">
+          <textarea id="optimized-prompt-output" readonly placeholder="Optimized prompt output will appear here after compression..." aria-label="Optimized prompt output"></textarea>
+          <div class="output-overlay-actions">
+            <button id="copy-output-btn" class="copy-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" id="copy-icon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Context
+            </button>
+          </div>
+        </div>
+
+        <!-- Token Allocation Budget Visualization -->
+        <div class="token-budget-section">
+          <div class="control-label">Token Budget Distribution</div>
+          <div class="budget-bar-container">
+            <div class="budget-segment budget-execution" id="budget-exec-bar" style="width: 60%" title="Execution Space"></div>
+            <div class="budget-segment budget-memory" id="budget-mem-bar" style="width: 20%" title="Memory Injections"></div>
+            <div class="budget-segment budget-validation" id="budget-val-bar" style="width: 10%" title="Validation Buffers"></div>
+            <div class="budget-segment budget-recovery" id="budget-rec-bar" style="width: 10%" title="Recovery Safety Reserve"></div>
+          </div>
+          <div class="budget-legend">
+            <span><span class="legend-color legend-exec"></span> Execution (60%)</span>
+            <span><span class="legend-color legend-mem"></span> Memory (20%)</span>
+            <span><span class="legend-color legend-val"></span> Validation (10%)</span>
+            <span><span class="legend-color legend-rec"></span> Recovery (10%)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: MULTI-AGENT ORCHESTRATION PIPELINE -->
+    <section class="card pipeline-card" aria-labelledby="pipeline-heading">
+      <div class="card-header">
+        <h2 id="pipeline-heading">Agent Coordination Pipeline</h2>
+        <span class="card-subtitle">Real-time status of optimization sub-agents</span>
+      </div>
+      <div class="card-body flex-column">
+        <!-- Flow Diagram Container -->
+        <div class="agent-flow-container">
+          <svg class="flow-connections" id="flow-lines-svg">
+            <!-- Dynamic paths loaded by script linking agents -->
+            <path id="path-master-memory" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-memory-token" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-token-exec" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-token-recovery" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-exec-validation" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-validation-learning" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-learning-recovery" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+            <path id="path-recovery-master" d="" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+          </svg>
+
+          <!-- Agent Grid Nodes -->
+          <div class="agent-nodes-grid">
+            <div class="agent-node" id="agent-node-master" data-agent="master">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="agent-label">Master</div>
+            </div>
+
+            <div class="agent-node" id="agent-node-memory" data-agent="memory">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="agent-label">Memory</div>
+            </div>
+
+            <div class="agent-node" id="agent-node-token" data-agent="token">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3L6 21M18 3l-4 18"/></svg>
+              </div>
+              <div class="agent-label">Token</div>
+            </div>
+
+            <div class="agent-node" id="agent-node-execution" data-agent="execution">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div class="agent-label">Execution</div>
+            </div>
+
+            <div class="agent-node" id="agent-node-validation" data-agent="validation">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="agent-label">Validation</div>
+            </div>
+
+            <div class="agent-node" id="agent-node-learning" data-agent="learning">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12c0-2.22.73-4.27 1.96-5.93L12 12V2z"/></svg>
+              </div>
+              <div class="agent-label">Learning</div>
+            </div>
+
+            <div class="agent-node" id="agent-node-recovery" data-agent="recovery">
+              <div class="agent-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </div>
+              <div class="agent-label">Recovery</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal Logs -->
+        <div class="terminal-logs-wrapper">
+          <div class="terminal-header">
+            <span>Pipeline Execution Terminal</span>
+            <div class="terminal-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="terminal-body" id="pipeline-terminal-body">
+            <span class="terminal-line system">[System] Engine initialized in idle state. Awaiting context processing inputs...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LOWER LEVEL PANELS: CONTEXT SWITCHING & MEMORY SYSTEMS -->
+  <section class="dashboard-footer-section">
+    <div class="horizontal-panels-grid">
+      
+      <!-- FOOTER COL 1: CONTEXT SWITCHING SYSTEM -->
+      <article class="card mode-switcher-card" aria-labelledby="switcher-heading">
+        <div class="card-header">
+          <h2 id="switcher-heading">Context Switching System</h2>
+          <span class="card-subtitle">Dynamically adapt active models to target domains</span>
+        </div>
+        <div class="card-body">
+          <div class="modes-grid">
+            <button class="mode-btn active" data-mode="Research">Research</button>
+            <button class="mode-btn" data-mode="Coding">Coding</button>
+            <button class="mode-btn" data-mode="Planning">Planning</button>
+            <button class="mode-btn" data-mode="Writing">Writing</button>
+            <button class="mode-btn" data-mode="Creative">Creative</button>
+            <button class="mode-btn" data-mode="Analytical">Analytical</button>
+            <button class="mode-btn" data-mode="Execution">Execution</button>
+            <button class="mode-btn" data-mode="Review">Review</button>
+            <button class="mode-btn" data-mode="Debug">Debug</button>
+            <button class="mode-btn" data-mode="Learning">Learning</button>
+          </div>
+          <div class="context-mode-details">
+            <div class="detail-row">
+              <span class="detail-label">Active Strategy:</span>
+              <span id="active-mode-strategy" class="detail-value">Academic Synthesis & Semantic Structuring</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Instruction Focus:</span>
+              <span id="active-mode-focus" class="detail-value">Synthesize complex definitions, retain primary citations, and strip narrative transitions.</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- FOOTER COL 2: MEMORY ENGINE -->
+      <article class="card memory-card" aria-labelledby="memory-heading">
+        <div class="card-header">
+          <h2 id="memory-heading">Adaptive Memory Retrieval Engine</h2>
+          <span class="card-subtitle">Formula: <code class="formula-code">(Relevance &times; Priority &times; Recency) &divide; Token Cost</code></span>
+        </div>
+        <div class="card-body memory-layout">
+          <!-- Memory Controls -->
+          <div class="memory-controls">
+            <div class="search-box-wrapper">
+              <input type="text" id="memory-query-input" placeholder="Search memory keys (e.g. API credentials, design rules)..." aria-label="Query memories">
+              <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            
+            <form id="add-memory-form" class="memory-form">
+              <div class="form-inputs">
+                <input type="text" id="mem-key-input" placeholder="Key (e.g. StyleGuide)" required>
+                <input type="text" id="mem-val-input" placeholder="Content details..." required>
+                <div class="form-row-mini">
+                  <input type="number" id="mem-pri-input" min="1" max="10" placeholder="Pri (1-10)" value="5">
+                  <input type="number" id="mem-tok-input" min="10" max="1000" placeholder="Tokens" value="50">
+                </div>
+              </div>
+              <button type="submit" id="add-memory-btn" class="primary-btn-mini">Add Memory</button>
+            </form>
+          </div>
+
+          <!-- Memory List -->
+          <div class="memory-list-container">
+            <div class="memory-list-header">
+              <span>Active Memory Blocks</span>
+              <span class="sub-label">Green blocks are dynamically loaded into current window</span>
+            </div>
+            <div class="memory-list" id="memory-db-list">
+              <!-- Memory items dynamically loaded -->
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- FOOTER COL 3: LIMIT EXPIRY & RECOVERY -->
+      <article class="card recovery-card" aria-labelledby="recovery-heading">
+        <div class="card-header">
+          <h2 id="recovery-heading">Limit Expiry & Resume Snapshot</h2>
+          <span class="card-subtitle">Generate session checkpoints for prompt overflow</span>
+        </div>
+        <div class="card-body">
+          <div class="recovery-status-bar">
+            <span>Capacity Gauge:</span>
+            <span id="capacity-percentage-display">0% Full</span>
+          </div>
+          <div class="progress-bar-glow-wrapper">
+            <div class="gauge-bar-outer">
+              <div class="gauge-bar-fill" id="capacity-gauge-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="recovery-actions">
+            <button id="generate-snapshot-btn" class="primary-btn-mini w-100">Force Session Snapshot</button>
+            <button id="load-snapshot-btn" class="secondary-btn-mini w-100">Load Snapshot State</button>
+          </div>
+          
+          <div class="snapshot-display-container">
+            <textarea id="snapshot-result-text" readonly placeholder="Session snapshot code ready for resume..." aria-label="Session snapshot result"></textarea>
+            <button id="copy-snapshot-btn" class="copy-btn-mini">Copy Snapshot</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- POPUP INJECTOR FOR LOADING SNAPSHOT -->
+  <dialog id="load-snapshot-dialog" class="snapshot-modal">
+    <div class="modal-content">
+      <h3>Load Session Checkpoint</h3>
+      <p>Paste a previously generated SESSION SNAPSHOT to restore the token optimization variables, goals, and memory lists.</p>
+      <textarea id="snapshot-load-input" placeholder="Paste SESSION SNAPSHOT markdown here..."></textarea>
+      <div class="modal-actions">
+        <button id="modal-close-btn" class="secondary-btn-mini">Cancel</button>
+        <button id="modal-submit-btn" class="primary-btn-mini">Restore Snapshot</button>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="app-footer-credit">
+    <p>Token for AI Optimization System. Licensed under MIT. Powered by Adaptive Context Architectures.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
